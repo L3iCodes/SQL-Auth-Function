@@ -15,10 +15,25 @@ export const get_project_list = async (req, res) => {
     // const {user_id} = req.user; // Once Auth is applied
     const { user_id } = req.body;
 
-    const [projectList] = await pool.quer(
-        'SELECT '
-    )
+    try{
+        const [projectList] = await pool.query(
+            `SELECT pr.* 
+            FROM practice_database.user_projects as up
+            JOIN practice_database.users as us
+                ON up.user_id = us.user_id
+            JOIN practice_database.projects as pr
+                ON up.project_id = pr.project_id
+            WHERE up.user_id = ?`,
+            [ user_id ]        
+        )
+
+        res.status(202).json({success: true, message: "Project list fetched", result: projectList})
+
+    }catch(error){
+        res.status(401).json({success: false, message: "Failed to fetch project list", error})
+    }
 }
+    
 
 export const add_project = async (req, res) => {
     // const {user_id} = req.user; // Once Auth is applied
