@@ -100,6 +100,16 @@ export const login = async (req, res) => {
     }
 }
 
+export const logout = async (req, res) => {
+    res.clearCookie("jwt", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict"
+    });
+    return res.status(200).json({ success: true, message: "Logged out" });
+};
+
+
 export const refresh = (req, res) => {
     const cookies = req.cookies;
 
@@ -123,7 +133,6 @@ export const refresh = (req, res) => {
     });
 };
 
-
 export const authenticateJWT = (req, res, next) => {
     const authHeader = res.header['authorization'];
     if (!authHeader) return res.status(401).json({success:false, message: 'No token found'});
@@ -137,3 +146,7 @@ export const authenticateJWT = (req, res, next) => {
 
     });
 };
+
+export const verifyToken = (req, res) => {
+    return res.json({ message: "You are authenticated!", user: req.user });
+}
