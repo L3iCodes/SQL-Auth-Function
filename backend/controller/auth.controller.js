@@ -30,7 +30,7 @@ export const sign_up = async (req, res) =>{
 
     }catch(error){
         if(error.code === 'ER_DUP_ENTRY'){
-            return res.status(401).json({success: false, message: 'Username already used'})
+            return res.status(409).json({success: false, message: 'Username already used'})
         
         }else{
             return res.status(500).json({success: false, message: 'Failed to add user', error})
@@ -75,13 +75,12 @@ export const login = async (req, res) => {
         // Store REFRESH TOKEN in HttpOnly Cookie
         res.cookie("jwt", refreshToken, {
             httpOnly: true,
-            secure: true,
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days 24hr 60min 60sec 1000ms
         })
 
-        return res.status(201).json({
+        return res.status(200).json({
             success: true, 
             message: 'Login complete', 
             credentials: {
@@ -92,7 +91,7 @@ export const login = async (req, res) => {
         });
         
     }catch(error){
-        return res.status(401).json({success: false, message: 'Login failed', error})
+        return res.status(500).json({success: false, message: 'Login failed', error})
     }
 }
 
@@ -100,7 +99,7 @@ export const logout = async (req, res) => {
     res.clearCookie("jwt", {
         httpOnly: true,
         secure: true,
-        sameSite: "strict"
+        sameSite: "lax"
     });
     return res.status(200).json({ success: true, message: "Logged out" });
 };
@@ -144,5 +143,5 @@ export const authenticateJWT = (req, res, next) => {
 };
 
 export const verifyToken = (req, res) => {
-    return res.json({ message: "You are authenticated!", user: req.user });
+    return res.status(200).json({ message: "You are authenticated!", user: req.user });
 }
