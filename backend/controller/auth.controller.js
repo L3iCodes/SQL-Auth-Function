@@ -45,6 +45,7 @@ export const login = async (req, res) => {
     const { username, password } = req.body;
     console.log('Searching for USER: ' + username)
     
+    
     try{
         const [row] = await pool.query(
             `SELECT user_id, username, hashed_password FROM practice_database.users WHERE username = ?`,
@@ -84,7 +85,7 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days 24hr 60min 60sec 1000ms
         })
 
-        return res.status(401).json({
+        return res.status(201).json({
             success: true, 
             message: 'Login complete', 
             credentials: {
@@ -126,7 +127,6 @@ export const refresh = (req, res) => {
 export const authenticateJWT = (req, res, next) => {
     const authHeader = res.header['authorization'];
     if (!authHeader) return res.status(401).json({success:false, message: 'No token found'});
-
 
     const token = authHeader.split(" ")[1]; //Bearer <token>
     jwt.verify(token, process.env.SECRET, (err, user) => {
