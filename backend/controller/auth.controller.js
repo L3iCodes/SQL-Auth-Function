@@ -17,11 +17,9 @@ const pool = mysql.createPool({
 // Insert User in DB
 export const sign_up = async (req, res) =>{
     const {username, password} = req.body;
-    console.log(username)
 
     try{
         const hashed_password = await bcrypt.hash(password, 10);
-        console.log(`Creating New User: \nUsername: ${username} \nHashedPaswword: ${hashed_password}`)
 
         const [result] = await pool.query(
             `INSERT INTO practice_database.users (username, hashed_password) VALUES (?, ?)`,
@@ -31,7 +29,6 @@ export const sign_up = async (req, res) =>{
         return res.status(201).json({success: true, message: "Succesfully created user", result})
 
     }catch(error){
-        console.log(error.code)
         if(error.code === 'ER_DUP_ENTRY'){
             return res.status(401).json({success: false, message: 'Username already used'})
         
@@ -42,9 +39,7 @@ export const sign_up = async (req, res) =>{
 }
 
 export const login = async (req, res) => {
-    const { username, password } = req.body;
-    console.log('Searching for USER: ' + username)
-    
+    const { username, password } = req.body;    
     
     try{
         const [row] = await pool.query(
@@ -67,7 +62,7 @@ export const login = async (req, res) => {
         const accessToken = jwt.sign(
             {user_id: row[0].user_id, username: row[0].username,}, 
             process.env.SECRET, 
-            {expiresIn: '1h'}
+            {expiresIn: '15m'}
         );
 
         // Create REFRESH TOKEN 
@@ -81,7 +76,8 @@ export const login = async (req, res) => {
         res.cookie("jwt", refreshToken, {
             httpOnly: true,
             secure: true,
-            sameSite: "strict",
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days 24hr 60min 60sec 1000ms
         })
 
@@ -126,7 +122,7 @@ export const refresh = (req, res) => {
         const accessToken = jwt.sign(
             {user_id: decoded.user_id, username: decoded.username},
             process.env.SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '15m' }
         );
 
         return res.json({ accessToken })
@@ -134,7 +130,7 @@ export const refresh = (req, res) => {
 };
 
 export const authenticateJWT = (req, res, next) => {
-    const authHeader = res.header['authorization'];
+    const authHeader = req.headers['authorization'];
     if (!authHeader) return res.status(401).json({success:false, message: 'No token found'});
 
     const token = authHeader.split(" ")[1]; //Bearer <token>

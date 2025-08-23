@@ -7,8 +7,6 @@ export default function LoginPage(){
     const navigate = useNavigate()
     const {user, token, login, isLoading, isError} = useAuth()
     const [showPassword, setShowPassword] = useState(false)
-
-    console.log(user, token)
     
     const handleLogin = (e) => {
         e.preventDefault()

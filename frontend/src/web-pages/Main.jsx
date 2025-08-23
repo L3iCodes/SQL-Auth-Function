@@ -2,7 +2,7 @@ import { useAuth } from "../hooks/useAuth"
 
 export default function Main(){
     const { logout, token, user } = useAuth()
-    console.log(`TOKEN: ${token} \nUSER: ${user}`)
+    console.log(`TOKEN: ${token} \nUSER: ${user.username}`)
     
 
     return(
