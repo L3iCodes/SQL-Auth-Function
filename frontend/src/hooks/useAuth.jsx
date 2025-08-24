@@ -17,7 +17,14 @@ export const AuthProvider = ({ children }) => {
     const [messageError, setMessageError] = useState('')
 
     // Verify access token
-    const { data, isSuccess, error, isError } = useQuery({
+    // const { data, isSuccess, error, isError } = useQuery({
+    //     queryKey: ['authenticate', token],
+    //     queryFn: ({ queryKey }) => verify(queryKey[1]),
+    //     enabled: !!token && !isRefreshing,
+    //     retry: false,
+    // });
+
+    const {data, isSuccess, error, isError, refetch: verifyToken} = useQuery({
         queryKey: ['authenticate', token],
         queryFn: ({ queryKey }) => verify(queryKey[1]),
         enabled: !!token && !isRefreshing,
@@ -110,6 +117,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         loading,
         messageError,
+        verifyToken,
         clearError: () => setMessageError('')
     };
 

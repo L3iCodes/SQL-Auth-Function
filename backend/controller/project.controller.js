@@ -12,18 +12,36 @@ const pool = mysql.createPool({
 });
 
 export const get_project_list = async (req, res) => {
-    // const {user_id} = req.user; // Once Auth is applied
-    const { user_id } = req.body;
+    const {user_id} = req.user; // Once Auth is applied
 
     try{
         const [projectList] = await pool.query(
-            `SELECT pr.* 
-            FROM practice_database.user_projects as up
-            JOIN practice_database.users as us
-                ON up.user_id = us.user_id
-            JOIN practice_database.projects as pr
+            `SELECT
+                pr.*,
+                GROUP_CONCAT(
+                    DISTINCT us.username
+                    ORDER BY us.username
+                    SEPARATOR ','
+                ) as collaborators,
+                owner.username AS owner
+            FROM practice_database.user_projects AS up
+            JOIN practice_database.projects AS pr -- Get the projects
                 ON up.project_id = pr.project_id
-            WHERE up.user_id = ?`,
+            JOIN practice_database.users AS owner
+                ON owner.user_id = pr.owner_id
+            JOIN practice_database.user_projects AS all_collabs
+                ON all_collabs.project_id = pr.project_id
+            JOIN practice_database.users AS us  -- This gets collaborator details
+                ON all_collabs.user_id = us.user_id
+            WHERE up.user_id = ?
+            GROUP BY 
+                pr.project_id,
+                pr.project_name,
+                pr.project_description,
+                pr.created_at,
+                pr.owner_id,
+                owner.username
+            ;`,
             [ user_id ]        
         )
 

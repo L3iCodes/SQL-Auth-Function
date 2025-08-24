@@ -46,10 +46,10 @@ h5 {
 }
 
 body{
-  @apply flex justify-center h-[100vh] w-[100vw]
+  @apply flex justify-center h-[100dvh] w-[100dvw] box-border
 }
 .pageWrapper{
-  @apply m-5 pb-20 md:pb-0 max-w-[760px] h-[calc(100vh-2.50rem)] relative
+  @apply p-5 pb-20 md:pb-0 w-[100dvw] max-w-[760px] h-[calc(100dvh-2.50rem)] relative
 }
 
 input, textarea{
