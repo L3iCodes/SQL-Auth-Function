@@ -145,3 +145,4 @@ export const authenticateJWT = (req, res, next) => {
 export const verifyToken = (req, res) => {
     return res.status(200).json({ message: "You are authenticated!", user: req.user });
 }
+

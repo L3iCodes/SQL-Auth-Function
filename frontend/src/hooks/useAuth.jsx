@@ -1,5 +1,5 @@
 import  { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { login, refresh, verify } from '../api/auth.api.js';
+import { login, refresh, verify, signup } from '../api/auth.api.js';
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate} from 'react-router-dom';
 
@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     const [authenticated, setAuthenticated] = useState(false)
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [loading, setLoading] = useState(true)
+    const [messageError, setMessageError] = useState('')
 
     // Verify access token
     const { data, isSuccess, error, isError } = useQuery({
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }) => {
         onMutate: () => {
             // Stop verification query
             setIsRefreshing(true);
+            setLoading(true);
         },
         onSuccess: (data) => {
             setToken(data.accessToken)
@@ -40,6 +42,7 @@ export const AuthProvider = ({ children }) => {
         onError: (error) => {
             console.log('Refresh failed:', error);
             setIsRefreshing(false);
+            setLoading(false);
             logout()
         },
         retry: false,
@@ -67,10 +70,24 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', data.credentials.token);
             queryClient.setQueryData(['user'], data.user);
             setAuthenticated(true);
+            setLoading(false)
+            setMessageError('')
             navigate('/');
         },
         onError:(error) => {
-            console.log(error)
+            setLoading(false);
+            setMessageError(error.message)
+        }
+    });
+
+    const signupMutation = useMutation({
+        mutationFn: ({ username, password }) => signup(username, password),
+        onSuccess: (_data, credentials) => { //Credentials is what we passed in the mutationFn (data, variables, context)
+            setMessageError('')
+            loginMutation.mutate(credentials)
+        },
+        onError: (error) => {
+            setMessageError(error.message)
         }
     })
 
@@ -79,25 +96,29 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         setAuthenticated(false)
         localStorage.removeItem('token')
-    }
+    };
 
     const value = {
         token,
         authenticated,
         user,
         login: loginMutation.mutate,
-        isLoading: loginMutation.isLoading,
+        loginLoading: loginMutation.isLoading,
         isError: loginMutation.isError,
+        signup: signupMutation.mutate,
+        signupLoading: signupMutation.isLoading,
         logout,
-        loading
-    }
+        loading,
+        messageError,
+        clearError: () => setMessageError('')
+    };
 
     return (
         <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
-    )
-}
+    );
+};
 
 export const useAuth = () => {
     return useContext(AuthContext);

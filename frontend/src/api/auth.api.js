@@ -49,3 +49,19 @@ export async function refresh(){
         throw new Error(error.response.data.message)
     }
 }
+
+export async function signup(username, password){
+    try{
+        const res = await axios.post(
+            `${BACKEND_URL}/api/auth/sign_up`,
+            {username, password},
+            {
+                headers: {"Content-Type": "application/json",}
+            }
+        );
+
+        return res.data
+    }catch(error){
+        throw new Error(error.response.data.message)
+    }
+}

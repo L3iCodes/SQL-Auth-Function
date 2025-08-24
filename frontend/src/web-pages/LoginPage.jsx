@@ -5,7 +5,7 @@ import { useAuth } from "../hooks/useAuth"
 
 export default function LoginPage(){
     const navigate = useNavigate()
-    const {user, token, login, isLoading, isError} = useAuth()
+    const {user, token, login, loginLoading, isError, messageError, clearError} = useAuth()
     const [showPassword, setShowPassword] = useState(false)
     
     const handleLogin = (e) => {
@@ -50,16 +50,23 @@ export default function LoginPage(){
                         
                     </div>
                     
+                    <div className="self-end h-2"> 
+                        {messageError && <h5 className="text-red-500">{messageError}</h5>}
+                    </div>
+                    
                     <button 
                         type="submit"
-                        className="flex items-center justify-center bg-primary py-2 mt-5 rounded-[5px] cursor-pointer border-accent border-1 hover:bg-accent active:bg-primary"
-                        >Login
+                        className="flex items-center justify-center bg-primary py-2 mt-1 rounded-[5px] cursor-pointer border-accent border-1 hover:bg-accent active:bg-primary"
+                        >{loginLoading ? 'Logging In...' : 'Log In'}
                     </button>
 
                     <h5 
                         className="self-end text-subtext"
                         >Don't have an account? <span 
-                                                    onClick={() => navigate('/signup')}
+                                                    onClick={() => {
+                                                        clearError()
+                                                        navigate('/signup');
+                                                    }}
                                                     className="hover:text-text active:text-subtext cursor-pointer"
                                                     >Register Now
                                                 </span>
