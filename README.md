@@ -1,7 +1,7 @@
-# SQL Auth System
-**A React-based personal portfolio with a built-in project showcase and lightweight project manager**  
+# Authentication System
+**Built with ReactJS, Node.js, Express, and MySQL**  
 
-Personal practice on creating an Auth System using SQL and React.
+A personal practice project demonstrating how to implement an authentication system, including login, signup, token verification, and refresh token handling. The frontend is built with React, while the backend uses Node.js with Express and MySQL for data storage.
 
 ## ✨ Flow Diagram  
 This diagram represents how the authentication system works. When the app starts, it first checks if the user is logged in by looking for an existing access token. If an access token is found, it is verified to ensure it has not expired. If the token is still valid, the user remains logged in. If the token has expired, the system calls the refresh function. If a refresh token exists, a new access token is generated and the user stays logged in. If no refresh token is available, the user is logged out. 
