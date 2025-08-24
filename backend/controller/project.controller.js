@@ -54,8 +54,8 @@ export const get_project_list = async (req, res) => {
     
 
 export const add_project = async (req, res) => {
-    // const {user_id} = req.user; // Once Auth is applied
-    const {project_name, project_description, owner_id} = req.body;
+    const {user_id} = req.user; // Once Auth is applied
+    const {project_name, project_description} = req.body;
 
     console.log('Adding Project: ' + project_name);
 
@@ -63,13 +63,13 @@ export const add_project = async (req, res) => {
         // Add project in the Projects Table
         const [result] = await pool.query(
             'INSERT INTO practice_database.projects(project_name, project_description, owner_id) VALUES (?,?,?)',
-            [ project_name, project_description, owner_id ]
+            [ project_name, project_description, user_id ]
         )
 
         // Add userId and ProjectID in the Associative Table
         const user_project = await pool.query(
             'INSERT INTO practice_database.user_projects(user_id, project_id) VALUES (?,?)',
-            [ owner_id, result.insertId ]
+            [ user_id, result.insertId ]
         )
 
         res.status(202).json({success: true, message: "Project Added", result: [result, user_project]})
@@ -79,15 +79,13 @@ export const add_project = async (req, res) => {
 }
 
 export const delete_project = async (req, res) => {
-    // const {user_id} = req.user; // Once Auth is applied
-    const { owner_id, project_id } = req.body;
-
-    console.log('Deleting Project: ' + project_id);
+    const {user_id} = req.user; // Once Auth is applied
+    const { project_id } = req.body;
 
     try{
         const [result] = await pool.query(
             'DELETE FROM practice_database.projects WHERE project_id = ? AND owner_id = ?',
-            [project_id, owner_id]
+            [project_id, user_id]
         )
 
         if(result.affectedRows > 0){
