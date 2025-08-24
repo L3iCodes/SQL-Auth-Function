@@ -31,5 +31,5 @@ export default function useProjectData(){
         }
     })
 
-    return{projectsQuery, addProjectMutation, deleteProjectMutation, deleteProjectMutation}
+    return{projectsQuery, addProjectMutation, deleteProjectMutation}
 }
